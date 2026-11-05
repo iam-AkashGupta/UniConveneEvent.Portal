@@ -1,276 +1,250 @@
-// Initial Campus Events Data (Simple & Easy to Explain)
-let eventsList = [
+let eventsData = [
     {
         id: 1,
         title: "Annual Tech Fest 2026",
         category: "College Fest",
-        date: "2026-11-20",
-        venue: "Main Auditorium",
-        bookedSeats: 42,
-        totalSeats: 50
+        date: "Nov 20, 2026",
+        venue: "Baldev Raj Mittal Unipolis",
+        booked: 48,
+        total: 50
     },
     {
         id: 2,
-        title: "Web Development Workshop",
+        title: "Web Development Hands-on",
         category: "Workshop",
-        date: "2026-11-22",
+        date: "Nov 22, 2026",
         venue: "Block 34, Lab 201",
-        bookedSeats: 25,
-        totalSeats: 30
+        booked: 29,
+        total: 30
     },
     {
         id: 3,
-        title: "Coding Quiz Competition",
+        title: "Campus Coding Quiz",
         category: "Competition",
-        date: "2026-11-25",
+        date: "Nov 25, 2026",
         venue: "Seminar Hall 2",
-        bookedSeats: 19,
-        totalSeats: 20
+        booked: 20,
+        total: 20
     },
     {
         id: 4,
-        title: "Photography Club Meet",
+        title: "Photography Club PhotoWalk",
         category: "Club Activity",
-        date: "2026-11-28",
+        date: "Nov 28, 2026",
         venue: "Student Activity Center",
-        bookedSeats: 12,
-        totalSeats: 25
+        booked: 14,
+        total: 25
     }
 ];
 
-let currentCategory = "All";
-let registrationCounter = 102;
+let currentUser = null;
+let currentFilter = "All";
+let regTicketCounter = 903;
 
-// 1. Display Events on the Page and Update Dashboard
-function renderEvents() {
-    const container = document.getElementById("events-container");
+// 1. Render Event Cards with Live Seat Count
+function renderEventsGrid() {
+    const container = document.getElementById("events-grid");
     container.innerHTML = "";
 
-    for (let i = 0; i < eventsList.length; i++) {
-        let ev = eventsList[i];
+    const filtered = currentFilter === "All" 
+        ? eventsData 
+        : eventsData.filter(e => e.category === currentFilter);
 
-        // Check category filter
-        if (currentCategory !== "All" && ev.category !== currentCategory) {
-            continue;
-        }
+    document.getElementById("dir-count-text").innerText = `SHOWING ${filtered.length} EVENTS`;
 
-        let remainingSeats = ev.totalSeats - ev.bookedSeats;
-        let isFull = remainingSeats <= 0;
+    filtered.forEach(ev => {
+        const remaining = ev.total - ev.booked;
+        const isFull = remaining <= 0;
+        const percent = Math.round((ev.booked / ev.total) * 100);
 
-        let card = document.createElement("div");
-        card.className = "event-card";
+        const card = document.createElement("div");
+        card.className = "clean-event-card";
 
         card.innerHTML = `
-            <span class="event-tag">${ev.category}</span>
-            <h3>${ev.title}</h3>
-            <p class="event-info"><strong>Date:</strong> ${ev.date}</p>
-            <p class="event-info"><strong>Venue:</strong> ${ev.venue}</p>
-            <div class="seat-box">
-                <p><strong>Live Seat Count:</strong> ${ev.bookedSeats} / ${ev.totalSeats} Booked</p>
-                <p class="${isFull ? 'seat-full' : 'seat-open'}">
-                    ${isFull ? 'Status: Seat Limit Reached (Full)' : 'Seats Remaining: ' + remainingSeats}
-                </p>
+            <div>
+                <span class="event-category-tag">${ev.category}</span>
+                <h3 class="event-card-title">${ev.title}</h3>
+                <p class="event-meta-row"><strong>Date:</strong> ${ev.date}</p>
+                <p class="event-meta-row"><strong>Venue:</strong> ${ev.venue}</p>
             </div>
-            ${isFull 
-                ? `<button class="disabled-btn" disabled>Registration Closed</button>` 
-                : `<button class="primary-btn full-width" onclick="openRegisterModal(${ev.id})">Register Now</button>`
-            }
+
+            <div>
+                <div class="seat-status-box">
+                    <div class="seat-label-line">
+                        <span>Live Capacity</span>
+                        <span>${ev.booked} / ${ev.total}</span>
+                    </div>
+                    <div class="progress-bar-bg">
+                        <div class="progress-bar-fill ${isFull ? 'danger' : ''}" style="width: ${percent}%;"></div>
+                    </div>
+                    <span class="seat-state-text ${isFull ? 'full' : ''}">
+                        ${isFull ? '● Limit reached (Closed)' : `● ${remaining} seats available`}
+                    </span>
+                </div>
+
+                ${isFull 
+                    ? `<button class="card-action-btn" disabled>Registration Closed</button>` 
+                    : `<button class="card-action-btn" onclick="openBookingModal(${ev.id})">Register Seat →</button>`
+                }
+            </div>
         `;
 
         container.appendChild(card);
+    });
+
+    updateDashboardMetrics();
+}
+
+// 2. Filter Category via Chips
+function filterCategory(cat, element) {
+    currentFilter = cat;
+    document.querySelectorAll(".chip-btn").forEach(btn => btn.classList.remove("active"));
+    if (element) element.classList.add("active");
+    renderEventsGrid();
+}
+
+// 3. Category Click from Hero Blue Box
+function filterAndScroll(cat) {
+    currentFilter = cat;
+    document.querySelectorAll(".chip-btn").forEach(btn => {
+        if (btn.innerText.includes(cat) || (cat === "College Fest" && btn.innerText.includes("Fests"))) {
+            btn.classList.add("active");
+        } else {
+            btn.classList.remove("active");
+        }
+    });
+    renderEventsGrid();
+    document.getElementById("events").scrollIntoView({ behavior: "smooth" });
+}
+
+// 4. Modal Handlers
+function openGetStartedModal() {
+    document.getElementById("modal-title").innerText = "Get started with UniConvene";
+    document.getElementById("auth-modal").classList.remove("hidden");
+}
+
+function openLoginModal() {
+    document.getElementById("modal-title").innerText = "Student / Organizer Login";
+    document.getElementById("auth-modal").classList.remove("hidden");
+}
+
+function closeAuthModal() {
+    document.getElementById("auth-modal").classList.add("hidden");
+}
+
+function handleAccountCreation(e) {
+    e.preventDefault();
+    const name = document.getElementById("acc-name").value;
+    const roll = document.getElementById("acc-roll").value;
+    const dept = document.getElementById("acc-dept").value;
+
+    currentUser = { name, roll, dept };
+
+    closeAuthModal();
+    showToast(`Welcome ${name}! Your student profile is active.`);
+    document.getElementById("events").scrollIntoView({ behavior: "smooth" });
+}
+
+// 5. Booking Modal Handlers
+function openBookingModal(eventId) {
+    const ev = eventsData.find(item => item.id === eventId);
+    document.getElementById("booking-event-id").value = eventId;
+    document.getElementById("booking-event-title").innerText = `Registering for: ${ev.title} (${ev.category})`;
+
+    if (currentUser) {
+        document.getElementById("book-name").value = currentUser.name;
+        document.getElementById("book-roll").value = currentUser.roll;
+        document.getElementById("book-dept").value = currentUser.dept;
     }
 
-    updateDashboard();
+    document.getElementById("booking-modal").classList.remove("hidden");
 }
 
-// 2. Filter Events When Clicking the Right Category Box
-function filterEvents(categoryName) {
-    currentCategory = categoryName;
-    document.getElementById("active-filter-text").innerText = "Showing: " + categoryName;
-    renderEvents();
-    scrollToSection("events-section");
+function closeBookingModal() {
+    document.getElementById("booking-modal").classList.add("hidden");
 }
 
-// 3. Open and Close Student Registration Modal
-function openRegisterModal(eventId) {
-    let selectedEvent = eventsList.find(item => item.id === eventId);
-    document.getElementById("register-event-id").value = eventId;
-    document.getElementById("selected-event-name").innerText = "Event: " + selectedEvent.title;
-    document.getElementById("register-modal").classList.remove("hidden");
-}
-
-function closeRegisterModal() {
-    document.getElementById("register-modal").classList.add("hidden");
-}
-
-// 4. Submit Student Registration & Live Seat Update
-function submitStudentRegistration(e) {
+function submitEventBooking(e) {
     e.preventDefault();
+    const eventId = parseInt(document.getElementById("booking-event-id").value);
+    const name = document.getElementById("book-name").value;
+    const roll = document.getElementById("book-roll").value;
 
-    let eventId = parseInt(document.getElementById("register-event-id").value);
-    let studentName = document.getElementById("student-name").value;
-    let studentRoll = document.getElementById("student-roll").value;
+    const ev = eventsData.find(item => item.id === eventId);
+    if (ev && ev.booked < ev.total) {
+        ev.booked += 1;
+        const ticketId = `#UC-${regTicketCounter++}`;
 
-    let ev = eventsList.find(item => item.id === eventId);
-
-    if (ev && ev.bookedSeats < ev.totalSeats) {
-        ev.bookedSeats = ev.bookedSeats + 1;
-        let regId = "#UC" + registrationCounter;
-        registrationCounter++;
-
-        // Add student to Admin Registration Table
-        let tableBody = document.getElementById("registered-students-table");
-        let newRow = document.createElement("tr");
-        newRow.innerHTML = `
-            <td>${regId}</td>
-            <td>${studentName}</td>
-            <td>${studentRoll}</td>
+        const tbody = document.getElementById("admin-students-table");
+        const row = document.createElement("tr");
+        row.innerHTML = `
+            <td>${ticketId}</td>
+            <td>${name}</td>
+            <td>${roll}</td>
             <td>${ev.title}</td>
         `;
-        tableBody.appendChild(newRow);
+        tbody.prepend(row);
 
-        // Show Confirmation Banner
-        let confirmBanner = document.getElementById("confirmation-banner");
-        let confirmMsg = document.getElementById("confirmation-message");
-        confirmMsg.innerText = ` ${studentName} (${studentRoll}) registered for ${ev.title}. Confirmation ID: ${regId}`;
-        confirmBanner.classList.remove("hidden");
-
-        // Add Notification
-        addNotification(`New Registration: ${studentName} joined "${ev.title}".`);
-        if (ev.bookedSeats === ev.totalSeats) {
-            addNotification(`Seat Limit Reached: "${ev.title}" is now 100% full.`);
-        }
-
-        // Reset form and refresh UI
-        document.getElementById("student-name").value = "";
-        document.getElementById("student-roll").value = "";
-        document.getElementById("student-dept").value = "";
-        closeRegisterModal();
-        renderEvents();
+        closeBookingModal();
+        renderEventsGrid();
+        showToast(`Registered successfully! Your Pass ID is ${ticketId}`);
     }
 }
 
-function closeConfirmation() {
-    document.getElementById("confirmation-banner").classList.add("hidden");
-}
-
-// 5. Update Organizer / Admin Dashboard
-function updateDashboard() {
-    let adminTable = document.getElementById("admin-event-table");
-    adminTable.innerHTML = "";
-
+// 6. Update Dashboard Tables and Metrics
+function updateDashboardMetrics() {
     let totalBooked = 0;
-    let totalRemaining = 0;
+    let totalCap = 0;
 
-    for (let i = 0; i < eventsList.length; i++) {
-        let ev = eventsList[i];
-        totalBooked += ev.bookedSeats;
-        totalRemaining += (ev.totalSeats - ev.bookedSeats);
+    const tbody = document.getElementById("admin-seats-table");
+    tbody.innerHTML = "";
 
-        let statusText = (ev.bookedSeats >= ev.totalSeats) ? "Full" : "Open";
+    eventsData.forEach(ev => {
+        totalBooked += ev.booked;
+        totalCap += ev.total;
 
-        let row = document.createElement("tr");
+        const isFull = ev.booked >= ev.total;
+        const row = document.createElement("tr");
         row.innerHTML = `
-            <td>${ev.title}</td>
-            <td>${ev.bookedSeats} / ${ev.totalSeats}</td>
-            <td>${statusText}</td>
+            <td><strong>${ev.title}</strong></td>
+            <td>${ev.booked} / ${ev.total}</td>
+            <td><span class="${isFull ? 'seat-state-text full' : 'seat-state-text'}">${isFull ? 'Full' : 'Open'}</span></td>
             <td>
-                <button class="small-btn" onclick="addFiveSeats(${ev.id})">+5 Seats</button>
+                <button class="mini-btn" onclick="increaseCapacity(${ev.id})">+5 Seats</button>
             </td>
         `;
-        adminTable.appendChild(row);
-    }
+        tbody.appendChild(row);
+    });
 
-    document.getElementById("stat-total-events").innerText = eventsList.length;
-    document.getElementById("stat-total-booked").innerText = totalBooked;
-    document.getElementById("stat-seats-left").innerText = totalRemaining;
+    document.getElementById("metric-total-events").innerText = eventsData.length;
+    document.getElementById("metric-booked").innerText = totalBooked;
+    document.getElementById("metric-available").innerText = (totalCap - totalBooked);
 }
 
-// 6. Organizer Feature: Add 5 Extra Seats to an Event
-function addFiveSeats(eventId) {
-    let ev = eventsList.find(item => item.id === eventId);
+// 7. Organizer: Increase Seat Capacity
+function increaseCapacity(eventId) {
+    const ev = eventsData.find(item => item.id === eventId);
     if (ev) {
-        ev.totalSeats += 5;
-        addNotification(`Organizer increased seat limit of "${ev.title}" by 5 seats.`);
-        renderEvents();
+        ev.total += 5;
+        renderEventsGrid();
+        showToast(`Increased seat capacity by 5 for "${ev.title}".`);
     }
 }
 
-// 7. Organizer Feature: Create a New Event
-function createNewEvent(e) {
-    e.preventDefault();
-
-    let title = document.getElementById("new-title").value;
-    let category = document.getElementById("new-category").value;
-    let date = document.getElementById("new-date").value;
-    let venue = document.getElementById("new-venue").value;
-    let seats = parseInt(document.getElementById("new-seats").value);
-
-    let newEventObj = {
-        id: eventsList.length + 1,
-        title: title,
-        category: category,
-        date: date,
-        venue: venue,
-        bookedSeats: 0,
-        totalSeats: seats
-    };
-
-    eventsList.push(newEventObj);
-    addNotification(`New Event Created: "${title}" (${seats} seats).`);
-
-    // Clear form
-    document.getElementById("create-event-form").reset();
-    renderEvents();
+// 8. Toast Helper
+function showToast(msg) {
+    const toast = document.getElementById("notif-toast");
+    document.getElementById("toast-message").innerText = msg;
+    toast.classList.remove("hidden");
+    setTimeout(() => {
+        toast.classList.add("hidden");
+    }, 4000);
 }
 
-// 8. Notifications Helper
-function toggleNotifications() {
-    let box = document.getElementById("notification-box");
-    box.classList.toggle("hidden");
+function closeToast() {
+    document.getElementById("notif-toast").classList.add("hidden");
 }
 
-function addNotification(message) {
-    let list = document.getElementById("notification-list");
-    let item = document.createElement("li");
-    item.innerText = message;
-    list.prepend(item);
-
-    let countSpan = document.getElementById("notif-count");
-    countSpan.innerText = list.children.length;
-}
-
-// 9. Simple Login Functionality
-function openLoginModal() {
-    document.getElementById("login-modal").classList.remove("hidden");
-}
-
-function closeLoginModal() {
-    document.getElementById("login-modal").classList.add("hidden");
-}
-
-function handleLogin(e) {
-    e.preventDefault();
-    let role = document.getElementById("login-role").value;
-    let userId = document.getElementById("login-userid").value;
-
-    document.getElementById("logged-user-Text").innerText = `Logged in as: ${userId} (${role})`;
-    document.getElementById("login-nav-btn").innerText = `${userId} (${role})`;
-
-    addNotification(`User "${userId}" logged in as ${role}.`);
-    closeLoginModal();
-
-    if (role === "Organizer") {
-        scrollToSection("dashboard-section");
-    }
-}
-
-// 10. Smooth Scroll to Section
-function scrollToSection(sectionId) {
-    document.getElementById(sectionId).scrollIntoView({ behavior: "smooth" });
-}
-
-// Load events when page opens
 window.onload = function() {
-    renderEvents();
+    renderEventsGrid();
 };
