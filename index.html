@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UniConvene: Centralized Campus Event Hub</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Top Navigation Bar with Proper Button Spacing -->
+    <header class="navbar">
+        <div class="logo">
+            <span class="logo-badge">UC</span>
+            <span class="logo-title">UniConvene: Centralized Campus Event Hub</span>
+        </div>
+
+        <nav class="nav-buttons">
+            <button class="nav-btn" onclick="scrollToSection('events-section')">Events</button>
+            <button class="nav-btn" onclick="scrollToSection('dashboard-section')">Organizer Dashboard</button>
+            <button class="nav-btn" onclick="toggleNotifications()">
+                Notifications (<span id="notif-count">2</span>)
+            </button>
+            <button class="nav-btn login-btn" id="login-nav-btn" onclick="openLoginModal()">Login</button>
+        </nav>
+    </header>
+
+    <!-- Notification Box (Hidden by default, opens on click) -->
+    <div id="notification-box" class="notification-panel hidden">
+        <div class="notif-header">
+            <h4>Campus Notifications</h4>
+            <button class="small-btn" onclick="toggleNotifications()">Close</button>
+        </div>
+        <ul id="notification-list">
+            <li>Welcome to UniConvene! Registration is open for campus events.</li>
+            <li>Alert: Coding Quiz Competition has only 1 seat remaining.</li>
+        </ul>
+    </div>
+
+    <!-- Main Hero Section (Simple Layout with Interactive Category Box) -->
+    <section class="hero-section">
+        <div class="hero-left">
+            <p class="small-tag">CAMPUS EVENT DIRECTORY</p>
+            <h1>Your campus has more to <span class="highlight-text">offer.</span></h1>
+            <p class="hero-desc">
+                Find college fests, workshops, competitions, and club activities in one place. 
+                Check live seat availability and register directly with instant confirmation.
+            </p>
+            <div class="hero-actions">
+                <button class="primary-btn" onclick="scrollToSection('events-section')">Find an Event</button>
+                <button class="secondary-btn" onclick="scrollToSection('dashboard-section')">Go to Admin Panel</button>
+            </div>
+            <p class="user-status" id="logged-user-Text">Current Status: Viewing as Guest</p>
+        </div>
+
+        <!-- Right Interactive Category Box (Click to filter events) -->
+        <div class="hero-category-box">
+            <p class="box-label">DISCOVER CATEGORIES</p>
+            <h2>Find your kind of event.</h2>
+            <p class="box-sub">Click on any category below to filter events:</p>
+
+            <div class="category-list">
+                <div class="category-item" onclick="filterEvents('College Fest')">
+                    <span>01   College Fests</span>
+                    <span>↗</span>
+                </div>
+                <div class="category-item" onclick="filterEvents('Workshop')">
+                    <span>02   Workshops</span>
+                    <span>↗</span>
+                </div>
+                <div class="category-item" onclick="filterEvents('Competition')">
+                    <span>03   Competitions</span>
+                    <span>↗</span>
+                </div>
+                <div class="category-item" onclick="filterEvents('Club Activity')">
+                    <span>04   Club Activities</span>
+                    <span>↗</span>
+                </div>
+            </div>
+
+            <button class="reset-filter-btn" onclick="filterEvents('All')">Show All Events</button>
+        </div>
+    </section>
+
+    <!-- Student Registration & Confirmation Alert Box -->
+    <div id="confirmation-banner" class="confirmation-banner hidden">
+        <strong>Registration Confirmed!</strong>
+        <span id="confirmation-message"></span>
+        <button class="small-btn" onclick="closeConfirmation()">OK</button>
+    </div>
+
+    <!-- Live Events & Student Registration Section -->
+    <section id="events-section" class="container">
+        <div class="section-header">
+            <div>
+                <h2>Available Campus Events</h2>
+                <p id="active-filter-text">Showing: All Categories</p>
+            </div>
+        </div>
+
+        <!-- Events Grid populated by JavaScript -->
+        <div id="events-container" class="events-grid"></div>
+    </section>
+
+    <!-- Organizer / Admin Dashboard Section -->
+    <section id="dashboard-section" class="container dashboard-box">
+        <div class="section-header">
+            <div>
+                <h2>Organizer / Admin Dashboard</h2>
+                <p>Create new events, manage seat capacity, and monitor registered students.</p>
+            </div>
+        </div>
+
+        <!-- Summary Cards -->
+        <div class="stats-row">
+            <div class="stat-card">
+                <h4>Total Events</h4>
+                <p id="stat-total-events">0</p>
+            </div>
+            <div class="stat-card">
+                <h4>Total Registered Students</h4>
+                <p id="stat-total-booked">0</p>
+            </div>
+            <div class="stat-card">
+                <h4>Remaining Seats</h4>
+                <p id="stat-seats-left">0</p>
+            </div>
+        </div>
+
+        <div class="dashboard-grid">
+            <!-- Form to Create New Event -->
+            <div class="admin-card">
+                <h3>1. Create New Event</h3>
+                <form id="create-event-form" onsubmit="createNewEvent(event)">
+                    <label>Event Title:</label>
+                    <input type="text" id="new-title" placeholder="e.g. Python Coding Workshop" required>
+
+                    <label>Category:</label>
+                    <select id="new-category">
+                        <option value="College Fest">College Fest</option>
+                        <option value="Workshop">Workshop</option>
+                        <option value="Competition">Competition</option>
+                        <option value="Club Activity">Club Activity</option>
+                    </select>
+
+                    <label>Event Date:</label>
+                    <input type="date" id="new-date" required>
+
+                    <label>Venue / Room No:</label>
+                    <input type="text" id="new-venue" placeholder="e.g. Block 32, Room 104" required>
+
+                    <label>Maximum Seat Limit:</label>
+                    <input type="number" id="new-seats" min="1" max="500" placeholder="e.g. 40" required>
+
+                    <button type="submit" class="primary-btn full-width">Add Event</button>
+                </form>
+            </div>
+
+            <!-- Table to Manage Seat Limits -->
+            <div class="admin-card">
+                <h3>2. Seat-Limit & Event Management</h3>
+                <table class="simple-table">
+                    <thead>
+                        <tr>
+                            <th>Event Name</th>
+                            <th>Live Seat Count</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="admin-event-table"></tbody>
+                </table>
+
+                <h3 style="margin-top: 25px;">3. Recent Student Registrations</h3>
+                <table class="simple-table">
+                    <thead>
+                        <tr>
+                            <th>Reg ID</th>
+                            <th>Student Name</th>
+                            <th>Roll No</th>
+                            <th>Event</th>
+                        </tr>
+                    </thead>
+                    <tbody id="registered-students-table">
+                        <tr>
+                            <td>#UC101</td>
+                            <td>Rahul Sharma</td>
+                            <td>12401122</td>
+                            <td>Web Development Workshop</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- Student Registration Modal -->
+    <div id="register-modal" class="modal-overlay hidden">
+        <div class="modal-box">
+            <h3>Student Event Registration</h3>
+            <p id="selected-event-name" class="modal-sub"></p>
+
+            <form onsubmit="submitStudentRegistration(event)">
+                <input type="hidden" id="register-event-id">
+
+                <label>Student Full Name:</label>
+                <input type="text" id="student-name" placeholder="Enter your name" required>
+
+                <label>Registration / Roll Number:</label>
+                <input type="text" id="student-roll" placeholder="e.g. 12405566" required>
+
+                <label>Department / Course:</label>
+                <input type="text" id="student-dept" placeholder="e.g. B.Tech CSE" required>
+
+                <div class="modal-buttons">
+                    <button type="submit" class="primary-btn">Confirm Registration</button>
+                    <button type="button" class="secondary-btn" onclick="closeRegisterModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div id="login-modal" class="modal-overlay hidden">
+        <div class="modal-box">
+            <h3>Campus Portal Login</h3>
+            <p class="modal-sub">Login as a Student or Event Organizer</p>
+
+            <form onsubmit="handleLogin(event)">
+                <label>Select Role:</label>
+                <select id="login-role">
+                    <option value="Student">Student</option>
+                    <option value="Organizer">Organizer / Admin</option>
+                </select>
+
+                <label>User ID / Registration No:</label>
+                <input type="text" id="login-userid" placeholder="Enter ID or Name" required>
+
+                <label>Password:</label>
+                <input type="password" id="login-password" placeholder="Enter password" required>
+
+                <div class="modal-buttons">
+                    <button type="submit" class="primary-btn">Login</button>
+                    <button type="button" class="secondary-btn" onclick="closeLoginModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <p>UniConvene: Centralized Campus Event Hub | Academic Project</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
