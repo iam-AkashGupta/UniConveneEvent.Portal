@@ -257,7 +257,7 @@ html {
 
 /* Right Editorial Blue Card */
 .blue-editorial-card {
-    background-color: #2563eb;
+    background-color: #1f3a5f;
     background-image: radial-gradient(circle at 100% 0%, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0) 50%);
     color: var(--white);
     padding: 40px;
