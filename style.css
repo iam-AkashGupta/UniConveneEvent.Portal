@@ -825,11 +825,12 @@ html {
 
 /* Footer */
 .footer {
-    background-color: #f7f6f2;
-    border-top: 1px solid #e8e6df;
+    background-color: #000000;
+    border-top: 1px solid #1f2937;
     padding: 40px 0 24px 0;
-    color: var(--text-muted);
+    color: var(--white);
     font-size: 13px;
+    font-weight: 700;
 }
 
 .footer-top {
@@ -837,7 +838,7 @@ html {
     justify-content: space-between;
     align-items: center;
     padding-bottom: 24px;
-    border-bottom: 1px solid #e8e6df;
+    border-bottom: 1px solid #374151;
     margin-bottom: 20px;
 }
 
@@ -848,13 +849,13 @@ html {
 }
 
 .brand-text strong {
-    color: var(--text-dark);
+    color: var(--white);
 }
 
 .back-to-top {
-    color: var(--primary-blue);
+    color: #facc15;
     text-decoration: none;
-    font-weight: 600;
+    font-weight: 700;
 }
 
 .footer-bottom {
@@ -862,13 +863,24 @@ html {
     justify-content: space-between;
     font-size: 11px;
     letter-spacing: 1px;
-    color: var(--text-subtle);
+    color: rgba(255, 255, 255, 0.8);
+    font-weight: 700;
 }
 
 .footer-credit {
     display: inline-flex;
     align-items: center;
     gap: 8px;
+}
+
+.footer-credit .footer-tag {
+    background-color: #facc15;
+    color: #000000;
+    padding: 7px 12px;
+    border-radius: 999px;
+    font-weight: 800;
+    letter-spacing: 1.2px;
+    box-shadow: 0 0 0 2px rgba(250, 204, 21, 0.2);
 }
 
 /* Modals & Toast */
