@@ -95,6 +95,7 @@ html {
     height: 24px;
     font-size: 10px;
     border-radius: 4px;
+    background-color: #facc15;
 }
 
 .logo-name {
@@ -570,9 +571,9 @@ html {
     cursor: not-allowed;
 }
 
-/* 3. Royal Blue Journey Section */
+/* 3. Black Journey Section */
 .blue-journey-section {
-    background-color: #173896;
+    background-color: #000000;
     color: var(--white);
     padding: 100px 0;
 }
