@@ -79,7 +79,7 @@ html {
 .logo-icon {
     width: 32px;
     height: 32px;
-    background-color: var(--primary-blue);
+    background-color: #e11d48;
     color: var(--white);
     border-radius: 6px;
     display: flex;
