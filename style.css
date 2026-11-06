@@ -162,12 +162,30 @@ html {
 
 .seat-alert {
     display: block;
+    overflow: hidden;
     background-color: #facc15;
     color: #000000;
     padding: 8px 0;
     font-size: 12px;
     font-weight: 800;
     letter-spacing: 1.5px;
+    white-space: nowrap;
+}
+
+.seat-alert-track {
+    display: inline-block;
+    padding-left: 100%;
+    animation: seat-alert-scroll 10s linear infinite;
+    will-change: transform;
+}
+
+@keyframes seat-alert-scroll {
+    from {
+        transform: translateX(0);
+    }
+    to {
+        transform: translateX(-100%);
+    }
 }
 
 .text-btn {
@@ -1104,5 +1122,15 @@ html {
     .footer-top {
         flex-wrap: wrap;
         gap: 18px;
+    }
+    .seat-alert-track {
+        animation-duration: 6s;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .seat-alert-track {
+        padding-left: 0;
+        animation: none;
     }
 }
