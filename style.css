@@ -125,6 +125,13 @@ html {
     color: var(--text-dark);
 }
 
+.nav-button {
+    background: none;
+    border: 0;
+    cursor: pointer;
+    font-family: inherit;
+}
+
 .nav-link.active::after {
     content: "";
     position: absolute;
@@ -202,13 +209,6 @@ html {
     font-size: 14px;
     text-decoration: underline;
     font-weight: 500;
-}
-
-.photo-button {
-    background: none;
-    border: 0;
-    cursor: pointer;
-    font-family: inherit;
 }
 
 /* 1. Hero Section */
