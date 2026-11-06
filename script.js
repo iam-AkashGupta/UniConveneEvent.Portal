@@ -1,37 +1,37 @@
 let eventsData = [
     {
         id: 1,
-        title: "Autumn Social: An Evening Together",
+        title: "Annual Robotics League",
         category: "Signature Gathering",
         date: "Nov 20, 2026",
-        venue: "The Courtyard, Unipolis",
+        venue: "Innovation Arena, Block 34",
         booked: 48,
         total: 50
     },
     {
         id: 2,
-        title: "Web Development Lab",
+        title: "Web Development Technical Lab",
         category: "Talk / Salon",
         date: "Nov 22, 2026",
-        venue: "Design Studio, Block 34",
+        venue: "Computer Centre, Lab 201",
         booked: 29,
         total: 30
     },
     {
         id: 3,
-        title: "The Student Showcase",
+        title: "Inter-Department Coding League",
         category: "Showcase",
         date: "Nov 25, 2026",
-        venue: "Main Auditorium",
+        venue: "Seminar Hall 2",
         booked: 20,
         total: 20
     },
     {
         id: 4,
-        title: "Photography Circle: Golden Hour",
+        title: "Photography Society Chapter Meet",
         category: "Club Circle",
         date: "Nov 28, 2026",
-        venue: "North Gate & Old Gardens",
+        venue: "Student Activity Centre",
         booked: 14,
         total: 25
     }
@@ -64,14 +64,14 @@ function renderEventsGrid() {
             <div>
                 <span class="event-category-tag">${ev.category}</span>
                 <h3 class="event-card-title">${ev.title}</h3>
-                <p class="event-meta-row"><strong>Date:</strong> ${ev.date}</p>
+                <p class="event-meta-row"><strong>When:</strong> ${ev.date}</p>
                 <p class="event-meta-row"><strong>Venue:</strong> ${ev.venue}</p>
             </div>
 
             <div>
                 <div class="seat-status-box">
                     <div class="seat-label-line">
-                        <span>Live availability</span>
+                        <span>Live capacity</span>
                         <span>${ev.booked} / ${ev.total}</span>
                     </div>
                     <div class="progress-bar-bg">
@@ -107,10 +107,10 @@ function filterCategory(cat, element) {
 function filterAndScroll(cat) {
     currentFilter = cat;
     const categoryLabels = {
-        "Signature Gathering": "Gatherings",
-        "Talk / Salon": "Talks & Salons",
-        "Showcase": "Showcases",
-        "Club Circle": "Clubs & Circles"
+        "Signature Gathering": "Flagship fests",
+        "Talk / Salon": "Tech labs",
+        "Showcase": "Competitions",
+        "Club Circle": "Society chapters"
     };
     document.querySelectorAll(".chip-btn").forEach(btn => {
         if (btn.innerText.includes(categoryLabels[cat] || cat)) {
@@ -125,7 +125,7 @@ function filterAndScroll(cat) {
 
 // 4. Modal Handlers
 function openGetStartedModal() {
-    document.getElementById("modal-title").innerText = "Join the UniConvene circle";
+    document.getElementById("modal-title").innerText = "Create your student event profile";
     document.getElementById("auth-modal").classList.remove("hidden");
 }
 
@@ -147,7 +147,7 @@ function handleAccountCreation(e) {
     currentUser = { name, roll, dept };
 
     closeAuthModal();
-    showToast(`Welcome ${name}! Your member profile is ready.`);
+    showToast(`Welcome ${name}! Your student profile is ready.`);
     document.getElementById("events").scrollIntoView({ behavior: "smooth" });
 }
 
