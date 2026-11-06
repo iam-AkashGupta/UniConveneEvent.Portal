@@ -141,6 +141,16 @@ html {
     gap: 18px;
 }
 
+.seat-alert {
+    display: block;
+    background-color: #facc15;
+    color: #000000;
+    padding: 8px 0;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+}
+
 .text-btn {
     background: none;
     border: none;
