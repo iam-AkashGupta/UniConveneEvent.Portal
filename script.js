@@ -245,6 +245,16 @@ function closeToast() {
     document.getElementById("notif-toast").classList.add("hidden");
 }
 
+function openEventPhoto() {
+    document.getElementById("event-photo-modal").classList.remove("hidden");
+}
+
+function closeEventPhoto(event) {
+    if (!event || event.target === document.getElementById("event-photo-modal")) {
+        document.getElementById("event-photo-modal").classList.add("hidden");
+    }
+}
+
 window.onload = function() {
     renderEventsGrid();
 };

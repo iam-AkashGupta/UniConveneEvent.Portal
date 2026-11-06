@@ -17,8 +17,6 @@
             </a>
 
             <nav class="nav-menu">
-                <a href="#hero" class="nav-link active">Discover</a>
-                <a href="#events" class="nav-link">Events</a>
                 <a href="#how-it-works" class="nav-link">How it works</a>
                 <a href="#organizers" class="nav-link">Organizers</a>
             </nav>
@@ -60,6 +58,7 @@
 
                 <div class="hero-buttons">
                     <a href="#events" class="primary-pill-btn icon-btn find-event-btn">Find an event  →</a>
+                    <button type="button" class="link-subtle photo-button" onclick="openEventPhoto()">View event photo</button>
                     <a href="#how-it-works" class="link-subtle">How UniConvene works</a>
                 </div>
 
@@ -295,9 +294,13 @@
                     <span>Emergency</span>
                     <strong>112</strong>
                 </a>
-                <a href="tel:9277281319" class="footer-contact-link">
-                    <span>Helpline</span>
-                    <strong>9277281319</strong>
+                <a href="tel:18001234567" class="footer-contact-link">
+                    <span>Helpline Number</span>
+                    <strong>1800-123-4567</strong>
+                </a>
+                <a href="mailto:helpdesk@uniconvene.example" class="footer-contact-link">
+                    <span>Queries</span>
+                    <strong>helpdesk@uniconvene.example</strong>
                 </a>
             </div>
             <a href="#hero" class="back-to-top">Back to top ↑</a>
@@ -311,6 +314,15 @@
             <span class="footer-tag">BUILT FOR CAMPUS COMMUNITIES</span>
         </div>
     </footer>
+
+    <!-- In-page Event Photo Viewer -->
+    <div id="event-photo-modal" class="modal-overlay hidden" onclick="closeEventPhoto(event)">
+        <div class="photo-viewer-box">
+            <button class="close-x photo-viewer-close" onclick="closeEventPhoto()">×</button>
+            <img src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&amp;fit=crop&amp;w=1400&amp;q=85" alt="Students attending a college event">
+            <p>Campus events bring everyone together.</p>
+        </div>
+    </div>
 
     <!-- Modals: Get Started / Log In -->
     <div id="auth-modal" class="modal-overlay hidden">

@@ -204,6 +204,13 @@ html {
     font-weight: 500;
 }
 
+.photo-button {
+    background: none;
+    border: 0;
+    cursor: pointer;
+    font-family: inherit;
+}
+
 /* 1. Hero Section */
 .hero-section {
     padding: 60px 0 80px 0;
@@ -862,6 +869,7 @@ html {
     display: flex;
     align-items: center;
     gap: 14px;
+    flex-wrap: wrap;
 }
 
 .footer-contact-label {
@@ -946,6 +954,40 @@ html {
     width: 440px;
     max-width: 90%;
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+.photo-viewer-box {
+    position: relative;
+    width: min(900px, 90%);
+    background-color: var(--white);
+    padding: 12px;
+    border-radius: 8px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+.photo-viewer-box img {
+    display: block;
+    width: 100%;
+    max-height: 75vh;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+.photo-viewer-box p {
+    margin: 12px 4px 2px;
+    color: var(--text-muted);
+    font-size: 13px;
+}
+
+.photo-viewer-close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    z-index: 1;
+    background-color: var(--white);
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
 }
 
 .modal-head {
