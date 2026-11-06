@@ -858,6 +858,39 @@ html {
     gap: 12px;
 }
 
+.footer-contact {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.footer-contact-label {
+    color: #facc15;
+    font-size: 10px;
+    letter-spacing: 1.2px;
+}
+
+.footer-contact-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--white);
+    text-decoration: none;
+    font-size: 12px;
+}
+
+.footer-contact-link span {
+    color: var(--text-subtle);
+}
+
+.footer-contact-link strong {
+    color: var(--white);
+}
+
+.footer-contact-link:hover strong {
+    color: #facc15;
+}
+
 .brand-text strong {
     color: var(--white);
 }
@@ -1013,5 +1046,9 @@ html {
     .split-header {
         flex-direction: column;
         align-items: flex-start;
+    }
+    .footer-top {
+        flex-wrap: wrap;
+        gap: 18px;
     }
 }
