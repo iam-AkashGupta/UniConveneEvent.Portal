@@ -175,7 +175,7 @@ html {
 .seat-alert-track {
     display: inline-block;
     padding-left: 100%;
-    animation: seat-alert-scroll 22s linear infinite;
+    animation: seat-alert-scroll 16s linear infinite;
     will-change: transform;
 }
 
@@ -1124,7 +1124,7 @@ html {
         gap: 18px;
     }
     .seat-alert-track {
-        animation-duration: 14s;
+        animation-duration: 8s;
     }
 }
 
