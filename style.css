@@ -170,6 +170,16 @@ html {
     background-color: var(--dark-blue);
 }
 
+.get-started-btn {
+    background-color: #8b5e3c;
+    padding: 8px 16px;
+    font-size: 13px;
+}
+
+.get-started-btn:hover {
+    background-color: #6f452b;
+}
+
 .link-subtle {
     color: var(--text-dark);
     font-size: 14px;
