@@ -1,37 +1,37 @@
 let eventsData = [
     {
         id: 1,
-        title: "Annual Tech Fest 2026",
-        category: "College Fest",
+        title: "Autumn Social: An Evening Together",
+        category: "Signature Gathering",
         date: "Nov 20, 2026",
-        venue: "Baldev Raj Mittal Unipolis",
+        venue: "The Courtyard, Unipolis",
         booked: 48,
         total: 50
     },
     {
         id: 2,
-        title: "Web Development Hands-on",
-        category: "Workshop",
+        title: "Web Development Lab",
+        category: "Talk / Salon",
         date: "Nov 22, 2026",
-        venue: "Block 34, Lab 201",
+        venue: "Design Studio, Block 34",
         booked: 29,
         total: 30
     },
     {
         id: 3,
-        title: "Campus Coding Quiz",
-        category: "Competition",
+        title: "The Student Showcase",
+        category: "Showcase",
         date: "Nov 25, 2026",
-        venue: "Seminar Hall 2",
+        venue: "Main Auditorium",
         booked: 20,
         total: 20
     },
     {
         id: 4,
-        title: "Photography Club PhotoWalk",
-        category: "Club Activity",
+        title: "Photography Circle: Golden Hour",
+        category: "Club Circle",
         date: "Nov 28, 2026",
-        venue: "Student Activity Center",
+        venue: "North Gate & Old Gardens",
         booked: 14,
         total: 25
     }
@@ -50,7 +50,7 @@ function renderEventsGrid() {
         ? eventsData 
         : eventsData.filter(e => e.category === currentFilter);
 
-    document.getElementById("dir-count-text").innerText = `SHOWING ${filtered.length} EVENTS`;
+    document.getElementById("dir-count-text").innerText = `SHOWING ${filtered.length} GATHERINGS`;
 
     filtered.forEach(ev => {
         const remaining = ev.total - ev.booked;
@@ -71,20 +71,20 @@ function renderEventsGrid() {
             <div>
                 <div class="seat-status-box">
                     <div class="seat-label-line">
-                        <span>Live Capacity</span>
+                        <span>Live availability</span>
                         <span>${ev.booked} / ${ev.total}</span>
                     </div>
                     <div class="progress-bar-bg">
                         <div class="progress-bar-fill ${isFull ? 'danger' : ''}" style="width: ${percent}%;"></div>
                     </div>
                     <span class="seat-state-text ${isFull ? 'full' : ''}">
-                        ${isFull ? '● Limit reached (Closed)' : `● ${remaining} seats available`}
+                        ${isFull ? '● Fully reserved' : `● ${remaining} places available`}
                     </span>
                 </div>
 
                 ${isFull 
-                    ? `<button class="card-action-btn" disabled>Registration Closed</button>` 
-                    : `<button class="card-action-btn" onclick="openBookingModal(${ev.id})">Register Seat →</button>`
+                    ? `<button class="card-action-btn" disabled>Reservations closed</button>`
+                    : `<button class="card-action-btn" onclick="openBookingModal(${ev.id})">Reserve a place →</button>`
                 }
             </div>
         `;
@@ -106,8 +106,14 @@ function filterCategory(cat, element) {
 // 3. Category Click from Hero Blue Box
 function filterAndScroll(cat) {
     currentFilter = cat;
+    const categoryLabels = {
+        "Signature Gathering": "Gatherings",
+        "Talk / Salon": "Talks & Salons",
+        "Showcase": "Showcases",
+        "Club Circle": "Clubs & Circles"
+    };
     document.querySelectorAll(".chip-btn").forEach(btn => {
-        if (btn.innerText.includes(cat) || (cat === "College Fest" && btn.innerText.includes("Fests"))) {
+        if (btn.innerText.includes(categoryLabels[cat] || cat)) {
             btn.classList.add("active");
         } else {
             btn.classList.remove("active");
@@ -119,12 +125,12 @@ function filterAndScroll(cat) {
 
 // 4. Modal Handlers
 function openGetStartedModal() {
-    document.getElementById("modal-title").innerText = "Get started with UniConvene";
+    document.getElementById("modal-title").innerText = "Join the UniConvene circle";
     document.getElementById("auth-modal").classList.remove("hidden");
 }
 
 function openLoginModal() {
-    document.getElementById("modal-title").innerText = "Student / Organizer Login";
+    document.getElementById("modal-title").innerText = "Member sign in";
     document.getElementById("auth-modal").classList.remove("hidden");
 }
 
@@ -141,7 +147,7 @@ function handleAccountCreation(e) {
     currentUser = { name, roll, dept };
 
     closeAuthModal();
-    showToast(`Welcome ${name}! Your student profile is active.`);
+    showToast(`Welcome ${name}! Your member profile is ready.`);
     document.getElementById("events").scrollIntoView({ behavior: "smooth" });
 }
 
@@ -149,7 +155,7 @@ function handleAccountCreation(e) {
 function openBookingModal(eventId) {
     const ev = eventsData.find(item => item.id === eventId);
     document.getElementById("booking-event-id").value = eventId;
-    document.getElementById("booking-event-title").innerText = `Registering for: ${ev.title} (${ev.category})`;
+    document.getElementById("booking-event-title").innerText = `Reserving a place for: ${ev.title} (${ev.category})`;
 
     if (currentUser) {
         document.getElementById("book-name").value = currentUser.name;
@@ -187,7 +193,7 @@ function submitEventBooking(e) {
 
         closeBookingModal();
         renderEventsGrid();
-        showToast(`Registered successfully! Your Pass ID is ${ticketId}`);
+        showToast(`Reservation confirmed. Your pass ID is ${ticketId}`);
     }
 }
 
@@ -210,7 +216,7 @@ function updateDashboardMetrics() {
             <td>${ev.booked} / ${ev.total}</td>
             <td><span class="${isFull ? 'seat-state-text full' : 'seat-state-text'}">${isFull ? 'Full' : 'Open'}</span></td>
             <td>
-                <button class="mini-btn" onclick="increaseCapacity(${ev.id})">+5 Seats</button>
+                <button class="mini-btn" onclick="increaseCapacity(${ev.id})">+5 places</button>
             </td>
         `;
         tbody.appendChild(row);
@@ -227,7 +233,7 @@ function increaseCapacity(eventId) {
     if (ev) {
         ev.total += 5;
         renderEventsGrid();
-        showToast(`Increased seat capacity by 5 for "${ev.title}".`);
+        showToast(`Added 5 places to "${ev.title}".`);
     }
 }
 

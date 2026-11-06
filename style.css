@@ -1,18 +1,18 @@
 :root {
-    --primary-blue: #1d4ed8;
-    --dark-blue: #1e3a8a;
-    --royal-blue: #172554;
-    --deep-blue: #0f172a;
-    --accent-orange: #ea580c;
-    --warm-terracotta: #c2410c;
-    --gold-accent: #f59e0b;
-    --cream-bg: #fafaf9;
-    --sand-bg: #f5f5f4;
+    --primary-blue: #183b56;
+    --dark-blue: #102a43;
+    --royal-blue: #102a43;
+    --deep-blue: #102a43;
+    --accent-orange: #b7791f;
+    --warm-terracotta: #9c4221;
+    --gold-accent: #d6a84f;
+    --cream-bg: #f7f2e8;
+    --sand-bg: #efe7d8;
     --white: #ffffff;
-    --text-dark: #0f172a;
-    --text-muted: #64748b;
-    --text-subtle: #94a3b8;
-    --border-light: #e2e8f0;
+    --text-dark: #1d2b36;
+    --text-muted: #66737b;
+    --text-subtle: #9a958a;
+    --border-light: #ded5c5;
     --border-dark: rgba(255, 255, 255, 0.18);
 }
 
@@ -1132,5 +1132,120 @@ html {
     .seat-alert-track {
         padding-left: 0;
         animation: none;
+    }
+}
+
+/* Classic campus editorial treatment */
+body {
+    background: var(--cream-bg);
+}
+
+.logo-icon,
+.logo-icon.small,
+.org-icon-badge {
+    background: var(--primary-blue);
+    border-radius: 50%;
+}
+
+.logo-name,
+.hero-title,
+.section-heading,
+.journey-title,
+.org-title,
+.inner-heading,
+.modal-head h3 {
+    font-family: Georgia, "Times New Roman", serif;
+}
+
+.navbar {
+    background-color: rgba(247, 242, 232, 0.96);
+    border-bottom-color: var(--border-light);
+}
+
+.seat-alert {
+    background-color: var(--primary-blue);
+    color: #f8edcf;
+}
+
+.hero-section,
+.organizer-section {
+    background-color: var(--cream-bg);
+}
+
+.hero-title {
+    font-size: 70px;
+    font-weight: 500;
+    letter-spacing: -2px;
+}
+
+.blue-editorial-card,
+.blue-journey-section {
+    background-color: var(--primary-blue);
+    background-image: radial-gradient(circle at 100% 0%, rgba(214, 168, 79, 0.25), transparent 46%);
+}
+
+.blue-editorial-card {
+    border-radius: 0;
+    border: 1px solid rgba(214, 168, 79, 0.45);
+}
+
+.primary-pill-btn,
+.find-event-btn,
+.get-started-btn {
+    background-color: var(--warm-terracotta);
+    border-radius: 2px;
+}
+
+.primary-pill-btn:hover,
+.find-event-btn:hover,
+.get-started-btn:hover {
+    background-color: #7f341d;
+}
+
+.events-section {
+    background-color: #fbf8f1;
+}
+
+.clean-event-card,
+.dashboard-panel,
+.table-card {
+    border-radius: 0;
+    border-color: var(--border-light);
+}
+
+.clean-event-card:hover {
+    box-shadow: 0 16px 30px -18px rgba(16, 42, 67, 0.35);
+}
+
+.chip-btn.active,
+.chip-btn:hover,
+.card-action-btn {
+    background-color: var(--primary-blue);
+    border-color: var(--primary-blue);
+}
+
+.progress-bar-fill {
+    background-color: var(--gold-accent);
+}
+
+.footer {
+    background-color: var(--primary-blue);
+    border-top-color: rgba(214, 168, 79, 0.45);
+}
+
+.footer-contact-label,
+.back-to-top {
+    color: var(--gold-accent);
+}
+
+.footer-credit .footer-tag {
+    background-color: var(--gold-accent);
+    color: var(--primary-blue);
+    box-shadow: none;
+}
+
+@media (max-width: 900px) {
+    .hero-title {
+        font-size: 46px;
     }
 }
