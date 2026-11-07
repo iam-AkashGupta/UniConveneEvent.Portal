@@ -344,10 +344,15 @@ html {
 }
 
 .inner-tag {
+    display: inline-block;
     font-size: 11px;
     letter-spacing: 1.8px;
     font-weight: 700;
     color: rgba(255, 255, 255, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.55);
+    padding: 6px 10px;
+    background-color: rgba(255, 255, 255, 0.06);
+    box-shadow: 3px 3px 0 rgba(255, 255, 255, 0.18);
     margin-bottom: 12px;
 }
 
