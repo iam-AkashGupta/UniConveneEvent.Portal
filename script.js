@@ -40,6 +40,53 @@ let eventsData = [
 let currentUser = null;
 let currentFilter = "All";
 let regTicketCounter = 903;
+let reservations = [];
+
+const EVENTS_STORAGE_KEY = "uniconvene-events";
+const RESERVATIONS_STORAGE_KEY = "uniconvene-reservations";
+const USER_STORAGE_KEY = "uniconvene-user";
+const TICKET_STORAGE_KEY = "uniconvene-ticket-counter";
+
+function loadSavedData() {
+    const savedEvents = localStorage.getItem(EVENTS_STORAGE_KEY);
+    const savedReservations = localStorage.getItem(RESERVATIONS_STORAGE_KEY);
+    const savedUser = localStorage.getItem(USER_STORAGE_KEY);
+    const savedTicketCounter = Number(localStorage.getItem(TICKET_STORAGE_KEY));
+
+    if (savedEvents) {
+        const parsedEvents = JSON.parse(savedEvents);
+        if (Array.isArray(parsedEvents) && parsedEvents.length > 0) {
+            eventsData = parsedEvents;
+        }
+    }
+
+    if (savedReservations) {
+        const parsedReservations = JSON.parse(savedReservations);
+        if (Array.isArray(parsedReservations)) {
+            reservations = parsedReservations;
+        }
+    }
+
+    if (savedUser) {
+        const parsedUser = JSON.parse(savedUser);
+        if (parsedUser && parsedUser.name && parsedUser.roll && parsedUser.dept) {
+            currentUser = parsedUser;
+        }
+    }
+
+    if (Number.isInteger(savedTicketCounter) && savedTicketCounter >= 903) {
+        regTicketCounter = savedTicketCounter;
+    }
+}
+
+function saveAppData() {
+    localStorage.setItem(EVENTS_STORAGE_KEY, JSON.stringify(eventsData));
+    localStorage.setItem(RESERVATIONS_STORAGE_KEY, JSON.stringify(reservations));
+    localStorage.setItem(TICKET_STORAGE_KEY, String(regTicketCounter));
+    if (currentUser) {
+        localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(currentUser));
+    }
+}
 
 // 1. Render Event Cards with Live Seat Count
 function renderEventsGrid() {
@@ -140,11 +187,17 @@ function closeAuthModal() {
 
 function handleAccountCreation(e) {
     e.preventDefault();
-    const name = document.getElementById("acc-name").value;
-    const roll = document.getElementById("acc-roll").value;
-    const dept = document.getElementById("acc-dept").value;
+    const name = document.getElementById("acc-name").value.trim();
+    const roll = document.getElementById("acc-roll").value.trim();
+    const dept = document.getElementById("acc-dept").value.trim();
+
+    if (!name || !roll || !dept) {
+        showToast("Please complete all student profile fields.");
+        return;
+    }
 
     currentUser = { name, roll, dept };
+    saveAppData();
 
     closeAuthModal();
     showToast(`Welcome ${name}! Your student profile is ready.`);
@@ -154,14 +207,17 @@ function handleAccountCreation(e) {
 // 5. Booking Modal Handlers
 function openBookingModal(eventId) {
     const ev = eventsData.find(item => item.id === eventId);
+    if (!ev) {
+        showToast("This event is no longer available.");
+        return;
+    }
+
     document.getElementById("booking-event-id").value = eventId;
     document.getElementById("booking-event-title").innerText = `Reserving a place for: ${ev.title} (${ev.category})`;
 
-    if (currentUser) {
-        document.getElementById("book-name").value = currentUser.name;
-        document.getElementById("book-roll").value = currentUser.roll;
-        document.getElementById("book-dept").value = currentUser.dept;
-    }
+    document.getElementById("book-name").value = currentUser ? currentUser.name : "";
+    document.getElementById("book-roll").value = currentUser ? currentUser.roll : "";
+    document.getElementById("book-dept").value = currentUser ? currentUser.dept : "";
 
     document.getElementById("booking-modal").classList.remove("hidden");
 }
@@ -173,28 +229,74 @@ function closeBookingModal() {
 function submitEventBooking(e) {
     e.preventDefault();
     const eventId = parseInt(document.getElementById("booking-event-id").value);
-    const name = document.getElementById("book-name").value;
-    const roll = document.getElementById("book-roll").value;
+    const name = document.getElementById("book-name").value.trim();
+    const roll = document.getElementById("book-roll").value.trim();
+    const dept = document.getElementById("book-dept").value.trim();
+
+    if (!name || !roll || !dept) {
+        showToast("Please complete all reservation fields.");
+        return;
+    }
 
     const ev = eventsData.find(item => item.id === eventId);
-    if (ev && ev.booked < ev.total) {
-        ev.booked += 1;
-        const ticketId = `#UC-${regTicketCounter++}`;
+    if (!ev) {
+        showToast("This event is no longer available.");
+        return;
+    }
 
-        const tbody = document.getElementById("admin-students-table");
-        const row = document.createElement("tr");
-        row.innerHTML = `
-            <td>${ticketId}</td>
-            <td>${name}</td>
-            <td>${roll}</td>
-            <td>${ev.title}</td>
-        `;
-        tbody.prepend(row);
-
+    if (ev.booked >= ev.total) {
         closeBookingModal();
         renderEventsGrid();
-        showToast(`Reservation confirmed. Your pass ID is ${ticketId}`);
+        showToast("Reservations for this event are closed.");
+        return;
     }
+
+    const normalizedRoll = roll.toLowerCase();
+    const alreadyRegistered = reservations.some(reservation =>
+        reservation.eventId === eventId &&
+        reservation.roll.toLowerCase() === normalizedRoll
+    );
+
+    if (alreadyRegistered) {
+        showToast("This roll number is already registered for this event.");
+        return;
+    }
+
+    ev.booked += 1;
+    const ticketId = `#UC-${regTicketCounter++}`;
+    reservations.unshift({
+        ticketId,
+        eventId,
+        eventTitle: ev.title,
+        name,
+        roll,
+        dept,
+        registeredAt: new Date().toISOString()
+    });
+
+    currentUser = { name, roll, dept };
+    saveAppData();
+    closeBookingModal();
+    e.target.reset();
+    renderEventsGrid();
+    renderRegisteredStudents();
+    showToast(`Reservation confirmed. Your pass ID is ${ticketId}`);
+}
+
+function renderRegisteredStudents() {
+    const tbody = document.getElementById("admin-students-table");
+    tbody.innerHTML = "";
+
+    reservations.forEach(reservation => {
+        const row = document.createElement("tr");
+        [reservation.ticketId, reservation.name, reservation.roll, reservation.eventTitle]
+            .forEach(value => {
+                const cell = document.createElement("td");
+                cell.textContent = value;
+                row.appendChild(cell);
+            });
+        tbody.appendChild(row);
+    });
 }
 
 // 6. Update Dashboard Tables and Metrics
@@ -232,6 +334,7 @@ function increaseCapacity(eventId) {
     const ev = eventsData.find(item => item.id === eventId);
     if (ev) {
         ev.total += 5;
+        saveAppData();
         renderEventsGrid();
         showToast(`Added 5 places to "${ev.title}".`);
     }
@@ -262,5 +365,7 @@ function closeEventPhoto(event) {
 }
 
 window.onload = function() {
+    loadSavedData();
     renderEventsGrid();
+    renderRegisteredStudents();
 };
