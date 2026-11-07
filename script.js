@@ -47,30 +47,83 @@ const RESERVATIONS_STORAGE_KEY = "uniconvene-reservations";
 const USER_STORAGE_KEY = "uniconvene-user";
 const TICKET_STORAGE_KEY = "uniconvene-ticket-counter";
 
+function escapeHtml(value) {
+    return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+function readStoredJson(key, fallback) {
+    const rawValue = localStorage.getItem(key);
+    if (!rawValue) {
+        return fallback;
+    }
+
+    try {
+        return JSON.parse(rawValue);
+    } catch (error) {
+        console.warn(`Ignoring invalid saved data for ${key}.`, error);
+        localStorage.removeItem(key);
+        return fallback;
+    }
+}
+
+function normalizeEvents(value) {
+    if (!Array.isArray(value)) {
+        return null;
+    }
+
+    const validEvents = value.filter(event =>
+        event &&
+        Number.isInteger(event.id) &&
+        typeof event.title === "string" &&
+        typeof event.category === "string" &&
+        typeof event.date === "string" &&
+        typeof event.venue === "string" &&
+        Number.isFinite(event.total) &&
+        event.total > 0 &&
+        Number.isFinite(event.booked)
+    ).map(event => ({
+        ...event,
+        total: Math.max(1, Math.floor(event.total)),
+        booked: Math.max(0, Math.min(Math.floor(event.booked), Math.floor(event.total)))
+    }));
+
+    return validEvents.length > 0 ? validEvents : null;
+}
+
 function loadSavedData() {
-    const savedEvents = localStorage.getItem(EVENTS_STORAGE_KEY);
-    const savedReservations = localStorage.getItem(RESERVATIONS_STORAGE_KEY);
-    const savedUser = localStorage.getItem(USER_STORAGE_KEY);
+    const savedEvents = normalizeEvents(readStoredJson(EVENTS_STORAGE_KEY, null));
+    const savedReservations = readStoredJson(RESERVATIONS_STORAGE_KEY, []);
+    const savedUser = readStoredJson(USER_STORAGE_KEY, null);
     const savedTicketCounter = Number(localStorage.getItem(TICKET_STORAGE_KEY));
 
     if (savedEvents) {
-        const parsedEvents = JSON.parse(savedEvents);
-        if (Array.isArray(parsedEvents) && parsedEvents.length > 0) {
-            eventsData = parsedEvents;
-        }
+        eventsData = savedEvents;
     }
 
-    if (savedReservations) {
-        const parsedReservations = JSON.parse(savedReservations);
-        if (Array.isArray(parsedReservations)) {
-            reservations = parsedReservations;
-        }
+    if (Array.isArray(savedReservations)) {
+        reservations = savedReservations.filter(reservation =>
+            reservation &&
+            Number.isInteger(reservation.eventId) &&
+            typeof reservation.ticketId === "string" &&
+            typeof reservation.name === "string" &&
+            typeof reservation.roll === "string" &&
+            typeof reservation.dept === "string" &&
+            typeof reservation.eventTitle === "string"
+        );
     }
 
     if (savedUser) {
-        const parsedUser = JSON.parse(savedUser);
-        if (parsedUser && parsedUser.name && parsedUser.roll && parsedUser.dept) {
-            currentUser = parsedUser;
+        if (savedUser.name && savedUser.roll && savedUser.dept) {
+            currentUser = {
+                name: String(savedUser.name),
+                roll: String(savedUser.roll),
+                dept: String(savedUser.dept)
+            };
         }
     }
 
@@ -100,19 +153,19 @@ function renderEventsGrid() {
     document.getElementById("dir-count-text").innerText = `SHOWING ${filtered.length} GATHERINGS`;
 
     filtered.forEach(ev => {
-        const remaining = ev.total - ev.booked;
+        const remaining = Math.max(0, ev.total - ev.booked);
         const isFull = remaining <= 0;
-        const percent = Math.round((ev.booked / ev.total) * 100);
+        const percent = Math.min(100, Math.max(0, Math.round((ev.booked / ev.total) * 100)));
 
         const card = document.createElement("div");
         card.className = "clean-event-card";
 
         card.innerHTML = `
             <div>
-                <span class="event-category-tag">${ev.category}</span>
-                <h3 class="event-card-title">${ev.title}</h3>
-                <p class="event-meta-row"><strong>When:</strong> ${ev.date}</p>
-                <p class="event-meta-row"><strong>Venue:</strong> ${ev.venue}</p>
+                <span class="event-category-tag">${escapeHtml(ev.category)}</span>
+                <h3 class="event-card-title">${escapeHtml(ev.title)}</h3>
+                <p class="event-meta-row"><strong>When:</strong> ${escapeHtml(ev.date)}</p>
+                <p class="event-meta-row"><strong>Venue:</strong> ${escapeHtml(ev.venue)}</p>
             </div>
 
             <div>
@@ -228,7 +281,7 @@ function closeBookingModal() {
 
 function submitEventBooking(e) {
     e.preventDefault();
-    const eventId = parseInt(document.getElementById("booking-event-id").value);
+    const eventId = Number.parseInt(document.getElementById("booking-event-id").value, 10);
     const name = document.getElementById("book-name").value.trim();
     const roll = document.getElementById("book-roll").value.trim();
     const dept = document.getElementById("book-dept").value.trim();
@@ -287,6 +340,13 @@ function renderRegisteredStudents() {
     const tbody = document.getElementById("admin-students-table");
     tbody.innerHTML = "";
 
+    if (reservations.length === 0) {
+        const row = document.createElement("tr");
+        row.innerHTML = '<td colspan="4">No reservations yet.</td>';
+        tbody.appendChild(row);
+        return;
+    }
+
     reservations.forEach(reservation => {
         const row = document.createElement("tr");
         [reservation.ticketId, reservation.name, reservation.roll, reservation.eventTitle]
@@ -314,7 +374,7 @@ function updateDashboardMetrics() {
         const isFull = ev.booked >= ev.total;
         const row = document.createElement("tr");
         row.innerHTML = `
-            <td><strong>${ev.title}</strong></td>
+            <td><strong>${escapeHtml(ev.title)}</strong></td>
             <td>${ev.booked} / ${ev.total}</td>
             <td><span class="${isFull ? 'seat-state-text full' : 'seat-state-text'}">${isFull ? 'Full' : 'Open'}</span></td>
             <td>
