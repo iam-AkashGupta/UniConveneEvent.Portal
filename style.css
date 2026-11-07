@@ -1254,3 +1254,40 @@ body {
         font-size: 46px;
     }
 }
+
+@media (max-width: 600px) {
+    .hero-section {
+        padding: 36px 0 52px;
+    }
+
+    .hero-container {
+        padding: 0 18px;
+        gap: 32px;
+    }
+
+    .card-top-meta {
+        margin-bottom: 26px;
+        font-size: 10px;
+        letter-spacing: 1.1px;
+    }
+
+    .inner-heading {
+        font-size: 32px;
+        line-height: 1.12;
+        letter-spacing: -0.5px;
+    }
+
+    .inner-desc {
+        font-size: 13px;
+        line-height: 1.5;
+        margin-bottom: 22px;
+    }
+
+    .cat-row {
+        padding: 13px 2px;
+    }
+
+    .cat-title {
+        font-size: 14px;
+    }
+}
